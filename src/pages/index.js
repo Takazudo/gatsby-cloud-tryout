@@ -1,30 +1,44 @@
 import * as React from "react"
-import { Link } from "gatsby"
-import { StaticImage } from "gatsby-plugin-image"
-
+import useAxios from "axios-hooks"
 import Layout from "../components/layout"
-import Seo from "../components/seo"
+import { css } from "@emotion/css"
 
-const IndexPage = () => (
-  <Layout>
-    <Seo title="Home" />
-    <h1>Hi people</h1>
-    <p>The quick brown fox jumps over the lazy dog. </p>
-    <p>Welcome to your new Gatsby site.</p>
-    <p>Now go build something great.</p>
-    <StaticImage
-      src="../images/gatsby-astronaut.png"
-      width={300}
-      quality={95}
-      formats={["AUTO", "WEBP", "AVIF"]}
-      alt="A Gatsby astronaut"
-      style={{ marginBottom: `1.45rem` }}
-    />
-    <p>
-      <Link to="/page-2/">Go to page 2</Link> <br />
-      <Link to="/using-typescript/">Go to "Using TypeScript"</Link>
-    </p>
-  </Layout>
-)
+const styles = {
+  dogs: css`
+    overflow: hidden;
+    margin: 0 0 0 -20px;
+  `,
+  dog: css`
+    width: 200px;
+    height: 200px;
+    margin: 20px 0 0 20px;
+    float: left;
+    img {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+      border: 1px solid black;
+    }
+  `,
+}
 
+const IndexPage = () => {
+  const [{ data, loading, error }, refetch] = useAxios("/api/dog")
+  return (
+    <Layout>
+      <h1>Gatsby cloud functions demo</h1>
+      <button onClick={() => refetch()}>Refetch!</button>
+      <div>{loading && "Loading..."}</div>
+      {error && <div>Error!</div>}
+      <div className={styles.dogs}>
+        {data &&
+          data.map(dog => (
+            <div className={styles.dog} key={dog.id}>
+              <img src={dog.src} alt="" />
+            </div>
+          ))}
+      </div>
+    </Layout>
+  )
+}
 export default IndexPage
